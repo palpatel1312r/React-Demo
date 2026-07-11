@@ -24,7 +24,6 @@ function Login() {
     password: "",
   });
 
-  // ✅ Redirect to Home (/) if already logged in
   useEffect(() => {
     if (isLoggedIn) {
       navigate("/");
@@ -38,7 +37,6 @@ function Login() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("📤 Login attempt with:", formData.email);
     dispatch(loginUser(formData));
   };
 
@@ -46,11 +44,13 @@ function Login() {
     <div className="mt-4">
       <div className="row justify-content-center">
         <div className="col-md-6 col-lg-5">
+          {/* ✅ Card uses theme from Redux */}
           <div
             className="card shadow-lg border-0"
             style={{
               backgroundColor: theme === "light" ? "#ffffff" : "#2d2d2d",
               color: theme === "light" ? "#000" : "#fff",
+              transition: "background-color 0.3s ease, color 0.3s ease",
             }}
           >
             <div className="card-body p-5">
@@ -144,24 +144,6 @@ function Login() {
                   <Link to="/register" className="text-primary fw-semibold">
                     Register here
                   </Link>
-                </p>
-              </div>
-
-              {/* Test Credentials */}
-              <div
-                className="mt-3 p-3 rounded"
-                style={{
-                  backgroundColor: theme === "light" ? "#f8f9fa" : "#3d3d3d",
-                  fontSize: "0.9rem",
-                }}
-              >
-                <p className="mb-1">
-                  <strong>Test Credentials:</strong>
-                </p>
-                <p className="mb-0">Email: admin@gmail.com</p>
-                <p className="mb-0">Password: 1234</p>
-                <p className="mb-0 text-muted" style={{ fontSize: "0.8rem" }}>
-                  (Make sure user exists in database)
                 </p>
               </div>
             </div>

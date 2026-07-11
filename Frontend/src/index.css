@@ -11,6 +11,152 @@ code {
   font-family:
     source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace;
 }
+/* src/index.css */
+
+/* Light Theme (Default) */
+.app.light {
+  background-color: #f0f2f5;
+  color: #1a1a1a;
+  min-height: 100vh;
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
+}
+
+/* Dark Theme */
+.app.dark {
+  background-color: #1a1a1a;
+  color: #f0f2f5;
+  min-height: 100vh;
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
+}
+
+/* Navbar Theme Support */
+.custom-navbar {
+  transition:
+    background-color 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+.app.light .custom-navbar {
+  background-color: #ffffff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.app.dark .custom-navbar {
+  background-color: #2d2d2d;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Navbar Links */
+.nav-link-custom {
+  transition: color 0.3s ease;
+}
+
+.app.light .nav-link-custom {
+  color: #333;
+}
+
+.app.dark .nav-link-custom {
+  color: #ccc;
+}
+
+.app.light .nav-link-custom:hover {
+  color: #007bff;
+}
+
+.app.dark .nav-link-custom:hover {
+  color: #4dc3ff;
+}
+
+/* Cards and Containers */
+.card {
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease,
+    border-color 0.3s ease;
+}
+
+.app.light .card {
+  background-color: #ffffff;
+  color: #1a1a1a;
+  border-color: #e0e0e0;
+}
+
+.app.dark .card {
+  background-color: #2d2d2d;
+  color: #f0f2f5;
+  border-color: #404040;
+}
+
+/* Form Inputs */
+.app.light .form-control {
+  background-color: #ffffff;
+  color: #1a1a1a;
+  border-color: #ddd;
+}
+
+.app.dark .form-control {
+  background-color: #3d3d3d;
+  color: #f0f2f5;
+  border-color: #555;
+}
+
+.app.dark .form-control::placeholder {
+  color: #888;
+}
+
+/* Buttons */
+.theme-toggle-btn {
+  transition: all 0.3s ease;
+}
+
+.theme-toggle-btn:hover {
+  transform: scale(1.05);
+}
+
+/* Logout Button */
+.logout-btn {
+  transition: color 0.3s ease;
+}
+
+.logout-btn:hover {
+  opacity: 0.8;
+}
+
+/* Text Colors */
+.text-muted {
+  transition: color 0.3s ease;
+}
+
+.app.light .text-muted {
+  color: #6c757d !important;
+}
+
+.app.dark .text-muted {
+  color: #aaa !important;
+}
+
+/* Alerts */
+.alert {
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
+}
+
+.app.dark .alert-danger {
+  background-color: #442222;
+  color: #ff8a8a;
+  border-color: #553333;
+}
+
+.app.dark .alert-success {
+  background-color: #224422;
+  color: #8aff8a;
+  border-color: #335533;
+}
 
 body {
   margin: 0;

@@ -117,6 +117,35 @@
     text-align: center;
     margin-top: 10px;
   }
+
+  /* Base setup for the navbar list (Mobile: Column & Centered) */
+  .navbar-nav.navbar-list {
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+  }
+
+  /* 🛠️ CRITICAL FIX: Specifically force the logout button to center itself */
+  .navbar-nav.navbar-list .logout-btn {
+    display: flex;
+    justify-content: center;
+    width: 100%; /* Forces the button to take full width on mobile, which centers the text */
+  }
+
+  /* Desktop: Make everything horizontal again */
+  @media (min-width: 992px) {
+    .navbar-nav.navbar-list {
+      flex-direction: row;
+      align-items: center;
+      width: auto;
+    }
+
+    /* On desktop, remove the full-width centering so it sits naturally next to other items */
+    .navbar-nav.navbar-list .logout-btn {
+      width: auto;
+      display: inline-flex;
+    }
+  }
 }
 
 /* Navbar Toggler Customization */

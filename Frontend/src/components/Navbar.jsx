@@ -2,13 +2,12 @@
 import React from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
-import { toggleTheme, selectTheme } from "../features/theme/themeSlice";
+import { selectTheme, toggleTheme } from "../features/theme/themeSlice";
 import {
   logoutUser,
-  logout, // ✅ Import the synchronous logout action
+  logout,
   selectUser,
   selectIsLoggedIn,
-  selectUserRole,
 } from "../features/auth/authSlice";
 
 const Navbar = () => {
@@ -17,30 +16,21 @@ const Navbar = () => {
   const theme = useSelector(selectTheme);
   const user = useSelector(selectUser);
   const isLoggedIn = useSelector(selectIsLoggedIn);
-  const role = useSelector(selectUserRole);
 
   const handleLogout = async () => {
     console.log("🔴 Logout button clicked");
 
     try {
-      // ✅ Dispatch the logout action
       await dispatch(logoutUser()).unwrap();
       console.log("✅ Logout dispatched successfully");
     } catch (error) {
       console.log("⚠️ Logout error, but continuing...");
-      // If the async logout fails, use the synchronous logout
       dispatch(logout());
     }
 
-    // ✅ Force clear localStorage as backup
     localStorage.removeItem("token");
     localStorage.removeItem("user");
-
-    // ✅ Navigate to login
     navigate("/login");
-
-    // ✅ Optional: Force reload to reset everything
-    // window.location.reload();
   };
 
   return (
@@ -64,7 +54,7 @@ const Navbar = () => {
         </button>
 
         <div className="collapse navbar-collapse" id="navbarNav">
-          <ul className="navbar-nav mx-auto">
+          <ul className="navbar-nav mx-auto navbar-list">
             {/* Navigation Links */}
             <li className="nav-item">
               <Link className="nav-link nav-link-custom" to="/">
@@ -84,7 +74,6 @@ const Navbar = () => {
 
             {/* Conditional: Show ONLY Logout OR Login/Register */}
             {isLoggedIn ? (
-              // ✅ Logged in: Show user name + Logout button
               <>
                 <li className="nav-item">
                   <span
@@ -97,7 +86,7 @@ const Navbar = () => {
                 </li>
                 <li className="nav-item">
                   <button
-                    className="nav-link nav-link-custom btn btn-link"
+                    className="nav-link nav-link-custom btn btn-link logout-btn"
                     onClick={handleLogout}
                     style={{
                       textDecoration: "none",
@@ -112,7 +101,6 @@ const Navbar = () => {
                 </li>
               </>
             ) : (
-              // ✅ Not logged in: Show Login and Register buttons
               <>
                 <li className="nav-item">
                   <Link className="nav-link nav-link-custom" to="/login">
@@ -127,10 +115,10 @@ const Navbar = () => {
               </>
             )}
 
-            {/* Theme Toggle - Always visible
+            {/* ✅ THEME TOGGLE BUTTON - Added here */}
             <li className="nav-item">
               <button
-                className="btn btn-sm ms-2"
+                className="btn btn-sm ms-2 theme-toggle-btn"
                 onClick={() => dispatch(toggleTheme())}
                 style={{
                   borderRadius: "20px",
@@ -138,11 +126,12 @@ const Navbar = () => {
                   color: theme === "light" ? "#ffffff" : "#1a1a1a",
                   border: "none",
                   padding: "5px 15px",
+                  transition: "all 0.3s ease",
                 }}
               >
                 {theme === "light" ? "🌙 Dark" : "☀️ Light"}
               </button>
-            </li> */}
+            </li>
           </ul>
         </div>
       </div>

@@ -42,12 +42,9 @@ function Register() {
     setLoading(true);
     setError("");
 
-    // Debug: Log all form data
     console.log("📝 Form Data:", formData);
-    console.log("Password:", formData.password);
-    console.log("Confirm Password:", formData.confirmPassword);
 
-    // ✅ Check if passwords match
+    // Check if passwords match
     if (formData.password !== formData.confirmPassword) {
       console.log("❌ Passwords don't match!");
       setError("❌ Passwords do not match");
@@ -55,7 +52,6 @@ function Register() {
       return;
     }
 
-    // Check if password is long enough
     if (formData.password.length < 4) {
       setError("❌ Password must be at least 4 characters long");
       setLoading(false);
@@ -63,12 +59,11 @@ function Register() {
     }
 
     try {
-      // ✅ Send ALL form data including confirmPassword
       const requestData = {
         name: formData.name,
         email: formData.email,
         password: formData.password,
-        confirmPassword: formData.confirmPassword, // ✅ IMPORTANT: Send this!
+        confirmPassword: formData.confirmPassword,
       };
 
       console.log("📤 Sending registration request:", requestData);
@@ -77,13 +72,9 @@ function Register() {
       console.log("📥 Registration response:", response);
 
       if (response.success) {
-        // Store token and user data
         localStorage.setItem("token", response.token);
         localStorage.setItem("user", JSON.stringify(response.user));
-
-        // Navigate to home
         navigate("/");
-        // Reload to update Redux state
         window.location.reload();
       } else {
         setError(response.message || "Registration failed");
@@ -105,12 +96,20 @@ function Register() {
             style={{
               backgroundColor: theme === "light" ? "#ffffff" : "#2d2d2d",
               color: theme === "light" ? "#000" : "#fff",
+              transition: "background-color 0.3s ease, color 0.3s ease",
             }}
           >
             <div className="card-body p-5">
               <div className="text-center mb-4">
                 <h2 className="fw-bold">Create Account</h2>
-                <p className="text-muted">Register to get started</p>
+                <p
+                  className="text-muted"
+                  style={{
+                    color: theme === "light" ? "#6c757d" : "#aaa",
+                  }}
+                >
+                  Register to get started
+                </p>
                 <div
                   className="mx-auto"
                   style={{
@@ -193,7 +192,14 @@ function Register() {
                       border: `1px solid ${theme === "light" ? "#ddd" : "#555"}`,
                     }}
                   />
-                  <small className="text-muted">Min 4 characters</small>
+                  <small
+                    className="text-muted"
+                    style={{
+                      color: theme === "light" ? "#6c757d" : "#888",
+                    }}
+                  >
+                    Min 4 characters
+                  </small>
                 </div>
 
                 <div className="mb-3">
@@ -238,7 +244,12 @@ function Register() {
               </form>
 
               <div className="mt-4 text-center">
-                <p className="text-muted">
+                <p
+                  className="text-muted"
+                  style={{
+                    color: theme === "light" ? "#6c757d" : "#aaa",
+                  }}
+                >
                   Already have an account?{" "}
                   <Link to="/login" className="text-primary fw-semibold">
                     Login here

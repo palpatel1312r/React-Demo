@@ -1,8 +1,12 @@
+// src/pages/Contact.jsx - Simple version without floating labels
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { selectTheme } from "../features/theme/themeSlice";
 
 function Contact() {
   const navigate = useNavigate();
+  const theme = useSelector(selectTheme);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -53,7 +57,14 @@ function Contact() {
 
   return (
     <div className="mt-4">
-      <div className="card shadow-lg border-0">
+      <div
+        className="card shadow-lg border-0"
+        style={{
+          backgroundColor: theme === "light" ? "#ffffff" : "#2d2d2d",
+          color: theme === "light" ? "#000" : "#fff",
+          transition: "background-color 0.3s ease, color 0.3s ease",
+        }}
+      >
         <div className="card-body p-5">
           <div className="text-center mb-4">
             <div className="bg-success bg-gradient text-white rounded-circle d-inline-flex p-4 mb-3">
@@ -68,7 +79,15 @@ function Contact() {
                 background: "linear-gradient(90deg, #198754, #20c997)",
               }}
             ></div>
-            <p className="text-muted mt-2">We'd love to hear from you!</p>
+            <p
+              className="mt-2"
+              style={{
+                color: theme === "light" ? "#6c757d" : "#aaa",
+                transition: "color 0.3s ease",
+              }}
+            >
+              We'd love to hear from you!
+            </p>
           </div>
 
           {submitted && (
@@ -95,56 +114,68 @@ function Contact() {
 
           <form onSubmit={handleSubmit}>
             <div className="row g-4">
+              {/* Name Field - Simple label */}
               <div className="col-md-6">
-                <div className="form-floating">
-                  <input
-                    type="text"
-                    className="form-control"
-                    id="name"
-                    name="name"
-                    placeholder="Your Name"
-                    value={formData.name}
-                    onChange={handleChange}
-                    required
-                  />
-                  <label htmlFor="name">
-                    <i className="bi bi-person me-2"></i>Your Name
-                  </label>
-                </div>
+                <label className="form-label fw-semibold">
+                  <i className="bi bi-person me-2"></i>Your Name
+                </label>
+                <input
+                  type="text"
+                  className="form-control form-control-lg"
+                  name="name"
+                  placeholder="Enter your name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  required
+                  style={{
+                    backgroundColor: theme === "light" ? "#fff" : "#3d3d3d",
+                    color: theme === "light" ? "#000" : "#fff",
+                    border: `1px solid ${theme === "light" ? "#ddd" : "#555"}`,
+                  }}
+                />
               </div>
+
+              {/* Email Field - Simple label */}
               <div className="col-md-6">
-                <div className="form-floating">
-                  <input
-                    type="email"
-                    className="form-control"
-                    id="email"
-                    name="email"
-                    placeholder="Your Email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    required
-                  />
-                  <label htmlFor="email">
-                    <i className="bi bi-envelope me-2"></i>Your Email
-                  </label>
-                </div>
+                <label className="form-label fw-semibold">
+                  <i className="bi bi-envelope me-2"></i>Your Email
+                </label>
+                <input
+                  type="email"
+                  className="form-control form-control-lg"
+                  name="email"
+                  placeholder="Enter your email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  required
+                  style={{
+                    backgroundColor: theme === "light" ? "#fff" : "#3d3d3d",
+                    color: theme === "light" ? "#000" : "#fff",
+                    border: `1px solid ${theme === "light" ? "#ddd" : "#555"}`,
+                  }}
+                />
               </div>
+
+              {/* Message Field - Simple label */}
               <div className="col-12">
-                <div className="form-floating">
-                  <textarea
-                    className="form-control"
-                    id="message"
-                    name="message"
-                    placeholder="Your Message"
-                    style={{ height: "150px" }}
-                    value={formData.message}
-                    onChange={handleChange}
-                    required
-                  ></textarea>
-                  <label htmlFor="message">
-                    <i className="bi bi-chat-dots me-2"></i>Your Message
-                  </label>
-                </div>
+                <label className="form-label fw-semibold">
+                  <i className="bi bi-chat-dots me-2"></i>Your Message
+                </label>
+                <textarea
+                  className="form-control form-control-lg"
+                  name="message"
+                  placeholder="Enter your message"
+                  style={{
+                    height: "150px",
+                    backgroundColor: theme === "light" ? "#fff" : "#3d3d3d",
+                    color: theme === "light" ? "#000" : "#fff",
+                    border: `1px solid ${theme === "light" ? "#ddd" : "#555"}`,
+                    resize: "vertical",
+                  }}
+                  value={formData.message}
+                  onChange={handleChange}
+                  required
+                ></textarea>
               </div>
             </div>
 
@@ -173,6 +204,10 @@ function Contact() {
                 type="button"
                 className="btn btn-outline-secondary btn-lg px-4 rounded-pill"
                 onClick={() => navigate(-1)}
+                style={{
+                  color: theme === "light" ? "#6c757d" : "#aaa",
+                  borderColor: theme === "light" ? "#6c757d" : "#555",
+                }}
               >
                 <i className="bi bi-arrow-left"></i>
               </button>
