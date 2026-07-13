@@ -72,6 +72,11 @@ const Navbar = () => {
               </Link>
             </li>
 
+            <li className="nav-item">
+              <Link className="nav-link nav-link-custom" to="/tasks">
+                <i className="fas fa-tasks me-1"></i> Tasks
+              </Link>
+            </li>
             {/* Conditional: Show ONLY Logout OR Login/Register */}
             {isLoggedIn ? (
               <>
@@ -114,7 +119,6 @@ const Navbar = () => {
                 </li>
               </>
             )}
-
             {/* ✅ THEME TOGGLE BUTTON - Added here */}
             <li className="nav-item">
               <button

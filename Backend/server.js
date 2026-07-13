@@ -1,10 +1,14 @@
+// Backend/server.js
 const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
 const authRoutes = require("./routes/authRoutes");
 const contactRoutes = require("./routes/contactRoutes");
+const taskRoutes = require("./routes/taskRoutes");
+
 const knex = require("knex");
 const knexConfig = require("./knexfile");
+const { Model } = require("objection"); // ✅ Import Model
 
 dotenv.config();
 
@@ -13,6 +17,9 @@ const PORT = process.env.PORT || 5000;
 
 // Initialize Knex
 const db = knex(knexConfig.development);
+
+// ✅ CRITICAL: Bind Knex to Objection Model
+Model.knex(db);
 
 // Test database connection
 const testDbConnection = async () => {
@@ -32,6 +39,19 @@ const testDbConnection = async () => {
       const count = await db("contacts").count("id as count").first();
       console.log(`📊 Total contacts: ${count.count}`);
     }
+
+    // Check if tasks table exists
+    const hasTasksTable = await db.schema.hasTable("tasks");
+    console.log(`📋 Tasks table exists: ${hasTasksTable}`);
+
+    if (!hasTasksTable) {
+      console.log("⚠️ Tasks table does not exist!");
+      console.log("📝 Please run: npx knex migrate:latest");
+    }
+
+    // Check if users table exists
+    const hasUsersTable = await db.schema.hasTable("users");
+    console.log(`📋 Users table exists: ${hasUsersTable}`);
   } catch (error) {
     console.error("❌ Database connection failed:", error.message);
     console.log("⚠️ Please check your .env file and database credentials");
@@ -50,81 +70,43 @@ app.use(
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Test routes
-app.get("/api/test", async (req, res) => {
-  try {
-    const result = await db.raw("SELECT 1+1 as test");
-    res.json({
-      success: true,
-      message: "Database connected!",
-      result: result[0][0],
-    });
-  } catch (error) {
-    console.error("Database test failed:", error);
-    res.status(500).json({
-      success: false,
-      message: "Database connection failed",
-      error: error.message,
-    });
-  }
-});
-
-app.get("/api/test-contacts", async (req, res) => {
-  try {
-    const contacts = await db("contacts").select("*");
-    res.json({
-      success: true,
-      count: contacts.length,
-      contacts: contacts,
-    });
-  } catch (error) {
-    console.error("Contacts test failed:", error);
-    res.status(500).json({
-      success: false,
-      message: "Failed to query contacts",
-      error: error.message,
-    });
-  }
-});
-
-app.post("/api/test-insert", async (req, res) => {
-  try {
-    console.log("🧪 Testing direct insert...");
-
-    const result = await db("contacts").insert({
-      name: "Test User",
-      email: "test@example.com",
-      message: "This is a test message",
-      is_read: false,
-      created_at: db.fn.now(),
-      updated_at: db.fn.now(),
-    });
-
-    console.log("✅ Test insert result:", result);
-
-    const contact = await db("contacts")
-      .select("*")
-      .where("id", result[0])
-      .first();
-
-    res.json({
-      success: true,
-      message: "Test insert successful!",
-      data: contact,
-    });
-  } catch (error) {
-    console.error("❌ Test insert failed:", error);
-    res.status(500).json({
-      success: false,
-      message: "Test insert failed",
-      error: error.message,
-    });
-  }
-});
-
 // Routes
+app.use("/api/tasks", taskRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/contacts", contactRoutes);
+
+// Add this test route
+app.get("/api/debug-tasks", async (req, res) => {
+  try {
+    // Check if tasks table exists
+    const hasTable = await db.schema.hasTable("tasks");
+
+    if (!hasTable) {
+      return res.status(400).json({
+        success: false,
+        message: "Tasks table does not exist! Run migrations.",
+      });
+    }
+
+    // Try to query the table
+    const result = await db("tasks").select("*").limit(5);
+
+    res.json({
+      success: true,
+      tableExists: hasTable,
+      tasks: result,
+      count: result.length,
+    });
+  } catch (error) {
+    console.error("Debug error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Debug error",
+      error: error.message,
+      sql: error.sql,
+    });
+  }
+});
 
 // 404 handler
 app.use((req, res) => {

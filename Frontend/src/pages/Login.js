@@ -24,6 +24,7 @@ function Login() {
     password: "",
   });
 
+  // Redirect to home if already logged in
   useEffect(() => {
     if (isLoggedIn) {
       navigate("/");
@@ -44,7 +45,6 @@ function Login() {
     <div className="mt-4">
       <div className="row justify-content-center">
         <div className="col-md-6 col-lg-5">
-          {/* ✅ Card uses theme from Redux */}
           <div
             className="card shadow-lg border-0"
             style={{

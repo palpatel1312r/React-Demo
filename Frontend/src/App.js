@@ -15,6 +15,7 @@ import Navbar from "./components/Navbar";
 import Home from "./pages/Home";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
+import Tasks from "./pages/Tasks";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 
@@ -43,7 +44,7 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/about" element={<About />} />
             <Route path="/contact" element={<Contact />} />
-
+            <Route path="/tasks" element={<Tasks />} />
             {/* Login Route - Redirect only if logged in */}
             <Route
               path="/login"
@@ -57,7 +58,6 @@ function App() {
             />
           </Routes>
         </main>
-   
       </div>
     </Router>
   );

@@ -1,63 +1,39 @@
-const knex = require("knex");
-const knexConfig = require("../knexfile");
-const bcrypt = require("bcryptjs");
+// Backend/models/User.js
+const { Model } = require("objection");
 
-const db = knex(knexConfig.development);
-
-class User {
-  // Create a new user
-  static async create({ name, email, password }) {
-    try {
-      const hashedPassword = await bcrypt.hash(password, 10);
-
-      const [user] = await db("users")
-        .insert({
-          name,
-          email,
-          password: hashedPassword,
-          created_at: db.fn.now(),
-          updated_at: db.fn.now(),
-        })
-        .returning(["id", "name", "email", "created_at"]);
-
-      return user;
-    } catch (error) {
-      console.error("Error creating user:", error);
-      throw error;
-    }
+class User extends Model {
+  static get tableName() {
+    return "users";
   }
 
-  // Find user by email
-  static async findByEmail(email) {
-    try {
-      return await db("users").select("*").where("email", email).first();
-    } catch (error) {
-      console.error("Error finding user by email:", error);
-      throw error;
-    }
+  static get jsonSchema() {
+    return {
+      type: "object",
+      required: ["name", "email", "password"],
+      properties: {
+        id: { type: "integer" },
+        name: { type: "string", minLength: 1, maxLength: 255 },
+        email: { type: "string", minLength: 1, maxLength: 255 },
+        password: { type: "string", minLength: 6 },
+        created_at: { type: "string", format: "date-time" },
+        updated_at: { type: "string", format: "date-time" },
+      },
+    };
   }
 
-  // Find user by ID
-  static async findById(id) {
-    try {
-      return await db("users")
-        .select("id", "name", "email", "created_at")
-        .where("id", id)
-        .first();
-    } catch (error) {
-      console.error("Error finding user by ID:", error);
-      throw error;
-    }
-  }
-
-  // Compare password
-  static async comparePassword(plainPassword, hashedPassword) {
-    try {
-      return await bcrypt.compare(plainPassword, hashedPassword);
-    } catch (error) {
-      console.error("Error comparing password:", error);
-      throw error;
-    }
+  static get relationMappings() {
+    // Use dynamic import to avoid circular dependency
+    const Task = require("./Task");
+    return {
+      tasks: {
+        relation: Model.HasManyRelation,
+        modelClass: Task,
+        join: {
+          from: "users.id",
+          to: "tasks.user_id",
+        },
+      },
+    };
   }
 }
 

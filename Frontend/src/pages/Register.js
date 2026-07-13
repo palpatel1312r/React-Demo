@@ -1,13 +1,12 @@
 // src/pages/Register.js
 import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { selectTheme } from "../features/theme/themeSlice";
 import { selectIsLoggedIn } from "../features/auth/authSlice";
 import { registerUser } from "../services/api";
 
 function Register() {
-  const dispatch = useDispatch();
   const navigate = useNavigate();
   const theme = useSelector(selectTheme);
   const isLoggedIn = useSelector(selectIsLoggedIn);
