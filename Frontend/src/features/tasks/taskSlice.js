@@ -1,4 +1,4 @@
-// frontend/src/features/tasks/taskSlice.js
+// Frontend/src/features/tasks/taskSlice.js
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import {
   createTask as createTaskAPI,
@@ -13,11 +13,7 @@ export const fetchTasks = createAsyncThunk(
   async (params = {}, { rejectWithValue }) => {
     try {
       const result = await getTasksAPI(params);
-      if (result.success) {
-        return result;
-      } else {
-        return rejectWithValue(result.message);
-      }
+      return result.success ? result : rejectWithValue(result.message);
     } catch (error) {
       return rejectWithValue(error.message || "Failed to fetch tasks");
     }
@@ -29,11 +25,7 @@ export const createTask = createAsyncThunk(
   async (taskData, { rejectWithValue }) => {
     try {
       const result = await createTaskAPI(taskData);
-      if (result.success) {
-        return result;
-      } else {
-        return rejectWithValue(result.message);
-      }
+      return result.success ? result : rejectWithValue(result.message);
     } catch (error) {
       return rejectWithValue(error.message || "Failed to create task");
     }
@@ -45,11 +37,7 @@ export const updateTask = createAsyncThunk(
   async ({ id, taskData }, { rejectWithValue }) => {
     try {
       const result = await updateTaskAPI(id, taskData);
-      if (result.success) {
-        return result;
-      } else {
-        return rejectWithValue(result.message);
-      }
+      return result.success ? result : rejectWithValue(result.message);
     } catch (error) {
       return rejectWithValue(error.message || "Failed to update task");
     }
@@ -61,11 +49,7 @@ export const deleteTask = createAsyncThunk(
   async (id, { rejectWithValue }) => {
     try {
       const result = await deleteTaskAPI(id);
-      if (result.success) {
-        return { id };
-      } else {
-        return rejectWithValue(result.message);
-      }
+      return result.success ? { id } : rejectWithValue(result.message);
     } catch (error) {
       return rejectWithValue(error.message || "Failed to delete task");
     }
@@ -76,10 +60,7 @@ const initialState = {
   tasks: [],
   loading: false,
   error: null,
-  filters: {
-    status: "",
-    priority: "",
-  },
+  filters: { status: "", priority: "" },
 };
 
 const taskSlice = createSlice({
@@ -112,7 +93,6 @@ const taskSlice = createSlice({
         state.loading = false;
         state.error = action.payload || "Failed to fetch tasks";
       })
-
       // Create Task
       .addCase(createTask.pending, (state) => {
         state.loading = true;
@@ -126,7 +106,6 @@ const taskSlice = createSlice({
         state.loading = false;
         state.error = action.payload || "Failed to create task";
       })
-
       // Update Task
       .addCase(updateTask.pending, (state) => {
         state.loading = true;
@@ -137,15 +116,12 @@ const taskSlice = createSlice({
         const index = state.tasks.findIndex(
           (t) => t.id === action.payload.task.id,
         );
-        if (index !== -1) {
-          state.tasks[index] = action.payload.task;
-        }
+        if (index !== -1) state.tasks[index] = action.payload.task;
       })
       .addCase(updateTask.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || "Failed to update task";
       })
-
       // Delete Task
       .addCase(deleteTask.pending, (state) => {
         state.loading = true;
@@ -171,19 +147,16 @@ export const selectTasks = (state) => state.tasks.tasks;
 export const selectTaskLoading = (state) => state.tasks.loading;
 export const selectTaskError = (state) => state.tasks.error;
 export const selectTaskFilters = (state) => state.tasks.filters;
+
 export const selectFilteredTasks = (state) => {
-  const tasks = state.tasks.tasks;
-  const filters = state.tasks.filters;
-
+  const { tasks, filters } = state.tasks;
   let filtered = tasks;
-
   if (filters.status) {
     filtered = filtered.filter((task) => task.status === filters.status);
   }
   if (filters.priority) {
     filtered = filtered.filter((task) => task.priority === filters.priority);
   }
-
   return filtered;
 };
 

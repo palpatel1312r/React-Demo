@@ -1,4 +1,4 @@
-// src/features/theme/themeSlice.js
+
 import { createSlice } from "@reduxjs/toolkit";
 
 // Get initial theme from localStorage or default to 'light'

@@ -13,9 +13,21 @@ const ConfirmDialog = ({
   cancelText = "Cancel",
   loading = false,
 }) => {
-  const theme = useSelector(selectTheme);
+  const isDark = useSelector(selectTheme) === "dark";
 
   if (!show) return null;
+
+  const s = {
+    bg: isDark ? "#2d2d2d" : "#fff",
+    text: isDark ? "#fff" : "#000",
+    border: isDark ? "#444" : "#e0e0e0",
+    iconBg: isDark ? "#7f1d1d" : "#fee2e2",
+    iconColor: isDark ? "#fca5a5" : "#dc2626",
+    cancelBg: isDark ? "#3d3d3d" : "#f3f4f6",
+    cancelColor: isDark ? "#d1d5db" : "#4b5563",
+    cancelBorder: isDark ? "#4b5563" : "#e5e7eb",
+    cancelHover: isDark ? "#4b5563" : "#e5e7eb",
+  };
 
   return (
     <div
@@ -30,30 +42,25 @@ const ConfirmDialog = ({
         <div
           className="modal-content"
           style={{
-            backgroundColor: theme === "light" ? "#ffffff" : "#2d2d2d",
-            color: theme === "light" ? "#000" : "#fff",
-            border: `1px solid ${theme === "light" ? "#e0e0e0" : "#444"}`,
+            backgroundColor: s.bg,
+            color: s.text,
+            border: `1px solid ${s.border}`,
             borderRadius: "16px",
-            boxShadow:
-              theme === "light"
-                ? "0 20px 60px rgba(0,0,0,0.15)"
-                : "0 20px 60px rgba(0,0,0,0.5)",
-            transition: "all 0.3s ease",
+            boxShadow: isDark
+              ? "0 20px 60px rgba(0,0,0,0.5)"
+              : "0 20px 60px rgba(0,0,0,0.15)",
           }}
         >
           <div
             className="modal-header border-0"
-            style={{
-              padding: "24px 24px 0 24px",
-            }}
+            style={{ padding: "24px 24px 0 24px" }}
           >
             <div
-              className="icon-container"
               style={{
                 width: "56px",
                 height: "56px",
                 borderRadius: "50%",
-                backgroundColor: theme === "light" ? "#fee2e2" : "#7f1d1d",
+                backgroundColor: s.iconBg,
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -62,19 +69,12 @@ const ConfirmDialog = ({
             >
               <i
                 className="fas fa-exclamation-triangle"
-                style={{
-                  fontSize: "24px",
-                  color: theme === "light" ? "#dc2626" : "#fca5a5",
-                }}
-              ></i>
+                style={{ fontSize: "24px", color: s.iconColor }}
+              />
             </div>
             <h5
               className="modal-title text-center w-100"
-              style={{
-                fontSize: "20px",
-                fontWeight: "600",
-                color: theme === "light" ? "#1a1a1a" : "#f0f0f0",
-              }}
+              style={{ fontSize: "20px", fontWeight: "600" }}
             >
               {title}
             </h5>
@@ -82,16 +82,13 @@ const ConfirmDialog = ({
 
           <div
             className="modal-body text-center"
-            style={{
-              padding: "8px 24px 24px 24px",
-            }}
+            style={{ padding: "8px 24px 24px 24px" }}
           >
             <p
               className="mb-0"
               style={{
                 fontSize: "16px",
-                color: theme === "light" ? "#6b7280" : "#b0b0b0",
-                lineHeight: "1.6",
+                color: isDark ? "#b0b0b0" : "#6b7280",
               }}
             >
               {message}
@@ -100,13 +97,9 @@ const ConfirmDialog = ({
 
           <div
             className="modal-footer border-0"
-            style={{
-              padding: "0 24px 24px 24px",
-              gap: "12px",
-            }}
+            style={{ padding: "0 24px 24px 24px", gap: "12px" }}
           >
             <button
-              type="button"
               className="btn"
               onClick={onCancel}
               disabled={loading}
@@ -114,27 +107,22 @@ const ConfirmDialog = ({
                 flex: 1,
                 padding: "10px 20px",
                 borderRadius: "10px",
-                backgroundColor: theme === "light" ? "#f3f4f6" : "#3d3d3d",
-                color: theme === "light" ? "#4b5563" : "#d1d5db",
-                border: `1px solid ${theme === "light" ? "#e5e7eb" : "#4b5563"}`,
+                backgroundColor: s.cancelBg,
+                color: s.cancelColor,
+                border: `1px solid ${s.cancelBorder}`,
                 fontWeight: "500",
-                transition: "all 0.2s ease",
               }}
               onMouseEnter={(e) => {
-                e.target.style.backgroundColor =
-                  theme === "light" ? "#e5e7eb" : "#4b5563";
+                e.target.style.backgroundColor = s.cancelHover;
               }}
               onMouseLeave={(e) => {
-                e.target.style.backgroundColor =
-                  theme === "light" ? "#f3f4f6" : "#3d3d3d";
+                e.target.style.backgroundColor = s.cancelBg;
               }}
             >
-              <i className="fas fa-times me-2"></i>
-              {cancelText}
+              <i className="fas fa-times me-2" /> {cancelText}
             </button>
 
             <button
-              type="button"
               className="btn btn-danger"
               onClick={onConfirm}
               disabled={loading}
@@ -146,7 +134,6 @@ const ConfirmDialog = ({
                 backgroundColor: "#dc2626",
                 color: "#fff",
                 border: "none",
-                transition: "all 0.2s ease",
               }}
               onMouseEnter={(e) => {
                 e.target.style.backgroundColor = "#b91c1c";
@@ -157,16 +144,12 @@ const ConfirmDialog = ({
             >
               {loading ? (
                 <>
-                  <span
-                    className="spinner-border spinner-border-sm me-2"
-                    role="status"
-                  ></span>
+                  <span className="spinner-border spinner-border-sm me-2" />{" "}
                   Deleting...
                 </>
               ) : (
                 <>
-                  <i className="fas fa-trash-alt me-2"></i>
-                  {confirmText}
+                  <i className="fas fa-trash-alt me-2" /> {confirmText}
                 </>
               )}
             </button>

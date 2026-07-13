@@ -1,4 +1,4 @@
-// Backend/controllers/authController.js
+
 const User = require("../models/User");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
@@ -38,7 +38,6 @@ exports.register = async (req, res) => {
       });
     }
 
-    // ✅ FIX: Use findOne instead of findByEmail
     const existingUser = await User.query().findOne({ email });
     if (existingUser) {
       console.log("❌ User already exists:", email);

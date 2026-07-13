@@ -1,4 +1,3 @@
-// src/App.js
 import React, { useEffect } from "react";
 import "./App.css";
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -62,5 +61,4 @@ function App() {
     </Router>
   );
 }
-
 export default App;

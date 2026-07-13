@@ -1,10 +1,7 @@
-// frontend/src/services/api.js
 const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000/api";
 
-// Get token from localStorage - this will be called when needed
 const getToken = () => localStorage.getItem("token");
 
-// Set auth header - this will be called fresh each time
 const getAuthHeader = () => ({
   Authorization: `Bearer ${getToken()}`,
   "Content-Type": "application/json",
@@ -107,8 +104,6 @@ export const getCurrentUser = async () => {
     };
   }
 };
-
-// ============ TASK API FUNCTIONS ============
 
 // Create a new task
 export const createTask = async (taskData) => {
