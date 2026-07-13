@@ -1,4 +1,3 @@
-// Backend/models/Task.js
 const { Model } = require("objection");
 
 class Task extends Model {
@@ -14,7 +13,10 @@ class Task extends Model {
         id: { type: "integer" },
         user_id: { type: "integer" },
         title: { type: "string", minLength: 1, maxLength: 255 },
-        description: { type: "string", maxLength: 1000 },
+        description: {
+          type: ["string", "null"], // Allow null
+          maxLength: 1000,
+        },
         status: {
           type: "string",
           enum: ["pending", "in-progress", "completed"],
@@ -25,7 +27,10 @@ class Task extends Model {
           enum: ["low", "medium", "high"],
           default: "medium",
         },
-        due_date: { type: "string", format: "date" },
+        due_date: {
+          type: ["string", "null"], // Allow null
+          format: "date",
+        },
         created_at: { type: "string", format: "date-time" },
         updated_at: { type: "string", format: "date-time" },
       },

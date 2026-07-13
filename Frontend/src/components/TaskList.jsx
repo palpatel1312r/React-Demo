@@ -1,4 +1,3 @@
-// Frontend/src/components/TaskList.jsx
 import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
@@ -95,6 +94,8 @@ const TaskList = () => {
     dispatch(clearFilters());
   };
 
+  const isDark = theme === "dark";
+
   // If user is not logged in, show login message
   if (!isLoggedIn) {
     return (
@@ -102,10 +103,10 @@ const TaskList = () => {
         <div
           className="text-center py-5"
           style={{
-            backgroundColor: theme === "light" ? "#f8f9fa" : "#2d2d2d",
+            backgroundColor: isDark ? "#2d2d2d" : "#f8f9fa",
             borderRadius: "16px",
             padding: "60px 20px",
-            border: `1px solid ${theme === "light" ? "#e5e7eb" : "#3d3d3d"}`,
+            border: `1px solid ${isDark ? "#3d3d3d" : "#e5e7eb"}`,
           }}
         >
           <div
@@ -114,7 +115,7 @@ const TaskList = () => {
               width: "80px",
               height: "80px",
               borderRadius: "50%",
-              backgroundColor: theme === "light" ? "#e5e7eb" : "#3d3d3d",
+              backgroundColor: isDark ? "#3d3d3d" : "#e5e7eb",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
@@ -125,14 +126,14 @@ const TaskList = () => {
               className="fas fa-lock"
               style={{
                 fontSize: "36px",
-                color: theme === "light" ? "#6b7280" : "#9ca3af",
+                color: isDark ? "#9ca3af" : "#6b7280",
               }}
             ></i>
           </div>
 
           <h3
             style={{
-              color: theme === "light" ? "#1a1a1a" : "#f0f0f0",
+              color: isDark ? "#f0f0f0" : "#1a1a1a",
               fontWeight: "600",
               marginBottom: "12px",
             }}
@@ -142,7 +143,7 @@ const TaskList = () => {
 
           <p
             style={{
-              color: theme === "light" ? "#6b7280" : "#b0b0b0",
+              color: isDark ? "#b0b0b0" : "#6b7280",
               fontSize: "16px",
               marginBottom: "24px",
               maxWidth: "400px",
@@ -172,7 +173,7 @@ const TaskList = () => {
             <Link
               to="/register"
               style={{
-                color: theme === "light" ? "#6b7280" : "#9ca3af",
+                color: isDark ? "#9ca3af" : "#6b7280",
                 textDecoration: "none",
               }}
             >
@@ -198,7 +199,7 @@ const TaskList = () => {
   return (
     <div className="container py-4">
       <div className="d-flex justify-content-between align-items-center mb-4">
-        <h2>My Tasks</h2>
+        <h2 style={{ color: isDark ? "#f0f0f0" : "#1a1a1a" }}>My Tasks</h2>
         <button className="btn btn-primary" onClick={() => setShowForm(true)}>
           <i className="fas fa-plus me-2"></i>
           Add Task
@@ -213,6 +214,11 @@ const TaskList = () => {
               className="form-select"
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value)}
+              style={{
+                backgroundColor: isDark ? "#2d2d2d" : "#ffffff",
+                color: isDark ? "#e0e0e0" : "#212529",
+                border: isDark ? "1px solid #3d3d3d" : "1px solid #ced4da",
+              }}
             >
               <option value="">All Status</option>
               <option value="pending">Pending</option>
@@ -223,6 +229,11 @@ const TaskList = () => {
               className="form-select"
               value={filterPriority}
               onChange={(e) => setFilterPriority(e.target.value)}
+              style={{
+                backgroundColor: isDark ? "#2d2d2d" : "#ffffff",
+                color: isDark ? "#e0e0e0" : "#212529",
+                border: isDark ? "1px solid #3d3d3d" : "1px solid #ced4da",
+              }}
             >
               <option value="">All Priority</option>
               <option value="low">Low</option>
@@ -230,8 +241,20 @@ const TaskList = () => {
               <option value="high">High</option>
             </select>
             <button
-              className="btn btn-outline-secondary"
+              className="btn"
               onClick={handleClearFilters}
+              style={{
+                backgroundColor: isDark ? "#3d3d3d" : "#6c757d",
+                color: isDark ? "#e0e0e0" : "#ffffff",
+                border: isDark ? "1px solid #3d3d3d" : "1px solid #6c757d",
+                whiteSpace: "nowrap",
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.backgroundColor = isDark ? "#4d4d4d" : "#5a6268";
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.backgroundColor = isDark ? "#3d3d3d" : "#6c757d";
+              }}
             >
               Clear
             </button>
@@ -242,8 +265,12 @@ const TaskList = () => {
       {/* Task List */}
       {tasks.length === 0 ? (
         <div className="text-center py-5">
-          <h4 className="text-muted">No tasks found</h4>
-          <p className="text-muted">Create your first task!</p>
+          <h4 style={{ color: isDark ? "#9ca3af" : "#6c757d" }}>
+            No tasks found
+          </h4>
+          <p style={{ color: isDark ? "#9ca3af" : "#6c757d" }}>
+            Create your first task!
+          </p>
         </div>
       ) : (
         <div className="row">

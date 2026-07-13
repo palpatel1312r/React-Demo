@@ -1,4 +1,3 @@
-// Backend/controllers/taskController.js
 const Task = require("../models/Task");
 
 exports.createTask = async (req, res) => {
@@ -28,14 +27,20 @@ exports.createTask = async (req, res) => {
       });
     }
 
-    const task = await Task.query().insert({
+    // Clean up data - convert empty strings to null
+    const taskData = {
       user_id,
-      title,
-      description: description || null,
+      title: title.trim(),
+      description:
+        description && description.trim() !== "" ? description.trim() : null,
       status: status || "pending",
       priority: priority || "medium",
-      due_date: due_date || null,
-    });
+      due_date: due_date && due_date.trim() !== "" ? due_date : null,
+    };
+
+    console.log("📝 Task data being inserted:", taskData);
+
+    const task = await Task.query().insert(taskData);
 
     console.log("✅ Task created:", task);
 
@@ -150,13 +155,19 @@ exports.updateTask = async (req, res) => {
       });
     }
 
-    const updatedTask = await Task.query().patchAndFetchById(id, {
-      title,
-      description,
-      status,
-      priority,
-      due_date,
-    });
+    // Clean up data - convert empty strings to null
+    const updateData = {
+      title: title ? title.trim() : existingTask.title,
+      description:
+        description && description.trim() !== "" ? description.trim() : null,
+      status: status || existingTask.status,
+      priority: priority || existingTask.priority,
+      due_date: due_date && due_date.trim() !== "" ? due_date : null,
+    };
+
+    console.log("📝 Update data:", updateData);
+
+    const updatedTask = await Task.query().patchAndFetchById(id, updateData);
 
     res.status(200).json({
       success: true,
