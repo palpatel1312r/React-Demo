@@ -1,56 +1,46 @@
-
+// Backend/middleware/auth.js
 const jwt = require("jsonwebtoken");
+const db = require("../config/db");
 
-module.exports = (req, res, next) => {
+// ✅ Get JWT_SECRET with fallback (same as controller)
+const JWT_SECRET =
+  process.env.JWT_SECRET ||
+  "RY+JmvJ35dWFpYhhLNBSEtHiMZvInCe5mXW07bm5GQW9ZPrJDynQIBkW5iZ93xWEpASyj/BONBk1+rR5NuGHdg==";
+
+module.exports = async (req, res, next) => {
   try {
-    // Get token from header
     const authHeader = req.header("Authorization");
-    console.log("🔐 Auth header:", authHeader);
+    console.log("🔑 Auth header:", authHeader ? "Present" : "Missing");
 
     if (!authHeader) {
-      console.log("❌ No Authorization header");
-      return res.status(401).json({
-        success: false,
-        message: "No token provided",
-      });
+      return res
+        .status(401)
+        .json({ message: "No token, authorization denied" });
     }
 
-    // Check if header starts with Bearer
-    if (!authHeader.startsWith("Bearer ")) {
-      console.log("❌ Invalid auth header format");
-      return res.status(401).json({
-        success: false,
-        message: "Invalid token format",
-      });
-    }
-
-    const token = authHeader.substring(7); // Remove "Bearer " prefix
-    console.log("🔑 Token received:", token.substring(0, 20) + "...");
+    const token = authHeader.replace("Bearer ", "");
+    console.log("🔑 Token received:", token.substring(0, 30) + "...");
 
     if (!token) {
-      console.log("❌ No token after Bearer");
-      return res.status(401).json({
-        success: false,
-        message: "No token provided",
-      });
+      return res
+        .status(401)
+        .json({ message: "No token, authorization denied" });
     }
 
-    // Verify token
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    console.log("✅ Decoded token:", decoded);
+    const decoded = jwt.verify(token, JWT_SECRET);
+    console.log("✅ Token decoded successfully:", decoded);
 
-    // ✅ IMPORTANT: Set user on request
-    req.user = decoded;
-    console.log("👤 User set on request:", req.user);
+    const user = await db("users").where("id", decoded.id).first();
+    console.log("👤 User found:", user ? user.id : "Not found");
 
+    if (!user) {
+      return res.status(401).json({ message: "Token is not valid" });
+    }
+
+    req.user = user;
     next();
   } catch (error) {
     console.error("❌ Auth error:", error.message);
-    console.error("Error stack:", error.stack);
-    return res.status(401).json({
-      success: false,
-      message: "Invalid or expired token",
-      error: error.message,
-    });
+    res.status(401).json({ message: "Token is not valid" });
   }
 };

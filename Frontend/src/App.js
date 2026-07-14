@@ -9,7 +9,11 @@ import {
 } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { selectTheme } from "./features/theme/themeSlice";
-import { restoreSession, selectIsLoggedIn } from "./features/auth/authSlice";
+import {
+  restoreSession,
+  selectIsLoggedIn,
+  fetchProfile, // ✅ Changed from loadUser to fetchProfile
+} from "./features/auth/authSlice";
 import Navbar from "./components/Navbar";
 import Home from "./pages/Home";
 import About from "./pages/About";
@@ -22,16 +26,27 @@ function App() {
   const dispatch = useDispatch();
   const theme = useSelector(selectTheme);
   const isLoggedIn = useSelector(selectIsLoggedIn);
+  const token = localStorage.getItem("token");
 
-  // Restore session on mount
+  // ✅ Restore session on mount - only once
   useEffect(() => {
     dispatch(restoreSession());
   }, [dispatch]);
 
+  // ✅ Load user if token exists - use fetchProfile
+  useEffect(() => {
+    if (token) {
+      dispatch(fetchProfile()); // ✅ Changed from loadUser to fetchProfile
+    }
+  }, [dispatch, token]);
+
   // Debug: Log the login state
   useEffect(() => {
-    console.log("isLoggedIn:", isLoggedIn);
-    console.log("Token:", localStorage.getItem("token"));
+    console.log("📌 App Debug:", {
+      isLoggedIn,
+      token: localStorage.getItem("token"),
+      user: localStorage.getItem("user"),
+    });
   }, [isLoggedIn]);
 
   return (
@@ -44,6 +59,7 @@ function App() {
             <Route path="/about" element={<About />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/tasks" element={<Tasks />} />
+
             {/* Login Route - Redirect only if logged in */}
             <Route
               path="/login"
@@ -61,4 +77,5 @@ function App() {
     </Router>
   );
 }
+
 export default App;

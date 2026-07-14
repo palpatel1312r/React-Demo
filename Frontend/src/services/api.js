@@ -25,8 +25,8 @@ export const registerUser = async (userData) => {
       return {
         success: true,
         token: data.token,
-        user: data.user,
-        message: data.message || "Registration successful",
+        user: { id: data.id, name: data.name, email: data.email }, // Fixed: data is the user directly
+        message: "Registration successful",
       };
     } else {
       return {
@@ -46,6 +46,8 @@ export const registerUser = async (userData) => {
 // Login user
 export const loginUser = async (credentials) => {
   try {
+    console.log("📤 API - Sending login data:", credentials);
+
     const response = await fetch(`${API_URL}/auth/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -53,13 +55,14 @@ export const loginUser = async (credentials) => {
     });
 
     const data = await response.json();
+    console.log("📥 API - Login response:", data);
 
     if (response.ok) {
       return {
         success: true,
         token: data.token,
-        user: data.user,
-        message: data.message || "Login successful",
+        user: { id: data.id, name: data.name, email: data.email }, // Fixed: data is the user directly
+        message: "Login successful",
       };
     } else {
       return {
@@ -68,7 +71,7 @@ export const loginUser = async (credentials) => {
       };
     }
   } catch (error) {
-    console.error("Login error:", error);
+    console.error("❌ API - Login error:", error);
     return {
       success: false,
       message: "Network error. Please check your connection.",
@@ -88,7 +91,7 @@ export const getCurrentUser = async () => {
     if (response.ok) {
       return {
         success: true,
-        user: data.user,
+        user: data, // Fixed: data is the user directly (id, name, email)
       };
     } else {
       return {
@@ -106,7 +109,7 @@ export const getCurrentUser = async () => {
 };
 
 // Create a new task
-export const createTask = async (taskData) => {
+export const createTaskAPI = async (taskData) => {
   try {
     console.log("📝 Creating task with data:", taskData);
     console.log("🔑 Token:", getToken());
@@ -125,8 +128,8 @@ export const createTask = async (taskData) => {
     if (response.ok) {
       return {
         success: true,
-        task: data.task,
-        message: data.message || "Task created successfully",
+        task: data, // Fixed: data is the task directly
+        message: "Task created successfully",
       };
     } else {
       return {
@@ -144,16 +147,17 @@ export const createTask = async (taskData) => {
 };
 
 // Get all tasks
-export const getTasks = async (params = {}) => {
+export const getTasksAPI = async (params = {}) => {
   try {
-    const queryString = new URLSearchParams(params).toString();
-    const url = queryString
-      ? `${API_URL}/tasks?${queryString}`
-      : `${API_URL}/tasks`;
+    // Check if params has any keys. If it's empty, don't add the "?"
+    let url = `${API_URL}/tasks`;
+
+    if (Object.keys(params).length > 0) {
+      const queryString = new URLSearchParams(params).toString();
+      url = `${API_URL}/tasks?${queryString}`;
+    }
 
     console.log("📡 Fetching tasks from:", url);
-    console.log("🔑 Token:", getToken());
-    console.log("📡 Headers:", getAuthHeader());
 
     const response = await fetch(url, {
       headers: getAuthHeader(),
@@ -167,8 +171,8 @@ export const getTasks = async (params = {}) => {
     if (response.ok) {
       return {
         success: true,
-        tasks: data.tasks || [],
-        count: data.count || 0,
+        tasks: data,
+        count: data.length || 0,
       };
     } else {
       return {
@@ -187,37 +191,8 @@ export const getTasks = async (params = {}) => {
   }
 };
 
-// Get a single task by ID
-export const getTaskById = async (id) => {
-  try {
-    const response = await fetch(`${API_URL}/tasks/${id}`, {
-      headers: getAuthHeader(),
-    });
-
-    const data = await response.json();
-
-    if (response.ok) {
-      return {
-        success: true,
-        task: data.task,
-      };
-    } else {
-      return {
-        success: false,
-        message: data.message || "Failed to fetch task",
-      };
-    }
-  } catch (error) {
-    console.error("Get task error:", error);
-    return {
-      success: false,
-      message: "Network error. Please check your connection.",
-    };
-  }
-};
-
 // Update a task
-export const updateTask = async (id, taskData) => {
+export const updateTaskAPI = async (id, taskData) => {
   try {
     const response = await fetch(`${API_URL}/tasks/${id}`, {
       method: "PUT",
@@ -230,8 +205,8 @@ export const updateTask = async (id, taskData) => {
     if (response.ok) {
       return {
         success: true,
-        task: data.task,
-        message: data.message || "Task updated successfully",
+        task: data, // Fixed: data is the task directly
+        message: "Task updated successfully",
       };
     } else {
       return {
@@ -249,7 +224,7 @@ export const updateTask = async (id, taskData) => {
 };
 
 // Delete a task
-export const deleteTask = async (id) => {
+export const deleteTaskAPI = async (id) => {
   try {
     const response = await fetch(`${API_URL}/tasks/${id}`, {
       method: "DELETE",

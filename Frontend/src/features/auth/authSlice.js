@@ -1,9 +1,8 @@
-
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
 // ✅ IMPORTANT: Make sure this has /api at the end
-const API_URL = "http://localhost:5000/api"; // Hardcode it for testing
+const API_URL = "http://localhost:5000/api";
 
 // Configure axios with token
 const setAuthToken = (token) => {
@@ -24,7 +23,11 @@ export const loginUser = createAsyncThunk(
       console.log("📤 Sending login request to:", `${API_URL}/auth/login`);
       const response = await axios.post(`${API_URL}/auth/login`, credentials);
       console.log("✅ Login response:", response.data);
-      const { token, user } = response.data;
+
+      // The backend returns: { id, name, email, token }
+      const { token, id, name, email } = response.data;
+      const user = { id, name, email };
+
       setAuthToken(token);
       return { user, token };
     } catch (error) {
@@ -34,12 +37,42 @@ export const loginUser = createAsyncThunk(
   },
 );
 
+export const registerUser = createAsyncThunk(
+  "auth/register",
+  async (userData, { rejectWithValue }) => {
+    try {
+      console.log(
+        "📤 Sending register request to:",
+        `${API_URL}/auth/register`,
+      );
+      const response = await axios.post(`${API_URL}/auth/register`, userData);
+      console.log("✅ Register response:", response.data);
+
+      // The backend returns: { id, name, email, token }
+      const { token, id, name, email } = response.data;
+      const user = { id, name, email };
+
+      setAuthToken(token);
+      return { user, token };
+    } catch (error) {
+      console.error(
+        "❌ Register error:",
+        error.response?.data || error.message,
+      );
+      return rejectWithValue(
+        error.response?.data?.message || "Registration failed",
+      );
+    }
+  },
+);
+
 export const fetchProfile = createAsyncThunk(
   "auth/fetchProfile",
   async (_, { rejectWithValue }) => {
     try {
       const response = await axios.get(`${API_URL}/auth/me`);
-      return response.data.user;
+      // The backend returns: { id, name, email }
+      return response.data;
     } catch (error) {
       return rejectWithValue(
         error.response?.data?.message || "Failed to fetch profile",
@@ -55,7 +88,7 @@ export const updateAvatar = createAsyncThunk(
       const response = await axios.put(`${API_URL}/auth/avatar`, {
         avatar: avatarUrl,
       });
-      return response.data.user;
+      return response.data;
     } catch (error) {
       return rejectWithValue(
         error.response?.data?.message || "Failed to update avatar",
@@ -86,7 +119,7 @@ const initialState = {
   isLoggedIn: !!localStorage.getItem("token"),
   isLoading: false,
   error: null,
-  role: null,
+  // Remove role from here since we don't have it
 };
 
 // Slice
@@ -109,7 +142,6 @@ const authSlice = createSlice({
       state.user = null;
       state.token = null;
       state.isLoggedIn = false;
-      state.role = null;
       state.isLoading = false;
       state.error = null;
       setAuthToken(null);
@@ -128,28 +160,49 @@ const authSlice = createSlice({
         state.isLoggedIn = true;
         state.user = action.payload.user;
         state.token = action.payload.token;
-        state.role = action.payload.user.role || "user";
+        // Remove role assignment
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
       })
+      // Register
+      .addCase(registerUser.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(registerUser.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isLoggedIn = true;
+        state.user = action.payload.user;
+        state.token = action.payload.token;
+      })
+      .addCase(registerUser.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload;
+      })
       // Fetch Profile
+      .addCase(fetchProfile.pending, (state) => {
+        state.isLoading = true;
+      })
       .addCase(fetchProfile.fulfilled, (state, action) => {
+        state.isLoading = false;
         state.user = action.payload;
-        state.role = action.payload.role;
+        // Remove role assignment
+      })
+      .addCase(fetchProfile.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload;
       })
       // Update Avatar
       .addCase(updateAvatar.fulfilled, (state, action) => {
         state.user = action.payload;
-        state.role = action.payload.role;
       })
       // Logout
       .addCase(logoutUser.fulfilled, (state) => {
         state.user = null;
         state.token = null;
         state.isLoggedIn = false;
-        state.role = null;
         state.isLoading = false;
         state.error = null;
         console.log("✅ Logout successful - State cleared");
@@ -158,7 +211,6 @@ const authSlice = createSlice({
         state.user = null;
         state.token = null;
         state.isLoggedIn = false;
-        state.role = null;
         state.isLoading = false;
         state.error = null;
         setAuthToken(null);
@@ -173,7 +225,7 @@ export const { clearError, restoreSession, logout } = authSlice.actions;
 // Selectors
 export const selectUser = (state) => state.auth.user;
 export const selectIsLoggedIn = (state) => state.auth.isLoggedIn;
-export const selectUserRole = (state) => state.auth.role;
+export const selectUserRole = (state) => state.auth.user?.role || null; // Safe access
 export const selectAuthLoading = (state) => state.auth.isLoading;
 export const selectAuthError = (state) => state.auth.error;
 

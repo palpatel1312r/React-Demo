@@ -1,27 +1,30 @@
+exports.up = async function (knex) {
+  // Add order column
+  const hasOrder = await knex.schema.hasColumn("tasks", "order");
+  if (!hasOrder) {
+    await knex.schema.table("tasks", function (table) {
+      table.integer("order").defaultTo(0);
+    });
+  }
 
-exports.up = function (knex) {
-  return knex.schema.createTable("tasks", function (table) {
-    table.increments("id").primary();
-    table.integer("user_id").unsigned().notNullable();
-    table.string("title", 255).notNullable();
-    table.text("description");
-    table
-      .enum("status", ["pending", "in-progress", "completed"])
-      .defaultTo("pending");
-    table.enum("priority", ["low", "medium", "high"]).defaultTo("medium");
-    table.date("due_date");
-    table.timestamps(true, true);
-
-    table
-      .foreign("user_id")
-      .references("id")
-      .inTable("users")
-      .onDelete("CASCADE");
-    table.index("user_id");
-    table.index("status");
-  });
+  // Add assigned_to column
+  const hasAssignedTo = await knex.schema.hasColumn("tasks", "assigned_to");
+  if (!hasAssignedTo) {
+    await knex.schema.table("tasks", function (table) {
+      table.integer("assigned_to").unsigned().nullable();
+      table
+        .foreign("assigned_to")
+        .references("id")
+        .inTable("users")
+        .onDelete("SET NULL");
+    });
+  }
 };
 
-exports.down = function (knex) {
-  return knex.schema.dropTable("tasks");
+exports.down = async function (knex) {
+  await knex.schema.table("tasks", function (table) {
+    table.dropColumn("order");
+    table.dropForeign(["assigned_to"]);
+    table.dropColumn("assigned_to");
+  });
 };

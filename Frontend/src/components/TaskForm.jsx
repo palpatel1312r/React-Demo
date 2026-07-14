@@ -1,42 +1,64 @@
-
+// src/components/TaskForm.jsx
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { createTask, updateTask } from "../features/tasks/taskSlice";
+import {
+  createTask,
+  updateTask,
+  selectAllUsersSelector,
+  fetchTags,
+  selectAllTags,
+} from "../features/tasks/taskSlice";
 import { selectTheme } from "../features/theme/themeSlice";
+ 
 
-const TaskForm = ({ show, onClose, task }) => {
+const TaskForm = ({ show, onClose, task, currentUser }) => {
   const dispatch = useDispatch();
   const isDark = useSelector(selectTheme) === "dark";
+
   const [data, setData] = useState({
     title: "",
     description: "",
-    status: "",
     priority: "",
     due_date: "",
+    assigned_to: "",
   });
+  const [tags, setTags] = useState([]);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
   const [submitted, setSubmitted] = useState(false);
 
+  // Load available tags when component mounts
+  useEffect(() => {
+    dispatch(fetchTags());
+  }, [dispatch]);
+
+  // Reset form when task changes
   useEffect(() => {
     if (task) {
       setData({
         title: task.title || "",
         description: task.description || "",
-        status: task.status || "",
         priority: task.priority || "",
         due_date: task.due_date
           ? new Date(task.due_date).toISOString().split("T")[0]
           : "",
+        assigned_to: task.assigned_to || "",
       });
+      // Load tags from task
+      if (task.tags) {
+        setTags(task.tags.map((t) => (typeof t === "string" ? t : t.name)));
+      } else {
+        setTags([]);
+      }
     } else {
       setData({
         title: "",
         description: "",
-        status: "",
         priority: "",
         due_date: "",
+        assigned_to: "",
       });
+      setTags([]);
     }
     setErrors({});
     setSubmitted(false);
@@ -45,8 +67,7 @@ const TaskForm = ({ show, onClose, task }) => {
   const validate = () => {
     const e = {};
     if (!data.title?.trim()) e.title = "Title is required";
-    if (!data.status?.trim()) e.status = "Status is required";
-    if (!data.priority?.trim()) e.priority = "Priority is required";
+    if (!data.priority) e.priority = "Priority is required";
     if (!data.due_date?.trim()) e.due_date = "Due date is required";
     setErrors(e);
     return Object.keys(e).length === 0;
@@ -71,26 +92,33 @@ const TaskForm = ({ show, onClose, task }) => {
       const payload = {
         title: data.title.trim(),
         description: data.description.trim() || "",
-        status: data.status,
         priority: data.priority,
         due_date: data.due_date,
+        assigned_to: data.assigned_to || null,
+        tags: tags, // Include tags in payload
       };
+
+      console.log("📝 Submitting task:", payload);
+
       await dispatch(
         task
           ? updateTask({ id: task.id, taskData: payload })
           : createTask(payload),
       ).unwrap();
+
       onClose();
       setData({
         title: "",
         description: "",
-        status: "",
         priority: "",
         due_date: "",
+        assigned_to: "",
       });
+      setTags([]);
       setErrors({});
       setSubmitted(false);
     } catch (err) {
+      console.error("❌ Error saving task:", err);
       setErrors({ submit: err.message || "Failed to save" });
     } finally {
       setLoading(false);
@@ -145,7 +173,6 @@ const TaskForm = ({ show, onClose, task }) => {
                 <div className="alert alert-danger">{errors.submit}</div>
               )}
 
-              {/* Title - REQUIRED */}
               <div className="mb-3">
                 <label className="form-label" style={{ color: styles.text }}>
                   Title *
@@ -169,13 +196,12 @@ const TaskForm = ({ show, onClose, task }) => {
                 )}
               </div>
 
-              {/* Description - OPTIONAL */}
               <div className="mb-3">
                 <label className="form-label" style={{ color: styles.text }}>
                   Description
                 </label>
                 <textarea
-                  className={`form-control ${submitted && errors.description ? "is-invalid" : ""}`}
+                  className="form-control"
                   name="description"
                   value={data.description}
                   onChange={handleChange}
@@ -188,37 +214,9 @@ const TaskForm = ({ show, onClose, task }) => {
                     border: styles.border,
                   }}
                 />
-                {submitted && errors.description && (
-                  <div className="invalid-feedback">{errors.description}</div>
-                )}
               </div>
 
-              {/* Status and Priority - REQUIRED */}
               <div className="row">
-                <div className="col-md-6 mb-3">
-                  <label className="form-label" style={{ color: styles.text }}>
-                    Status *
-                  </label>
-                  <select
-                    className={`form-select ${submitted && errors.status ? "is-invalid" : ""}`}
-                    name="status"
-                    value={data.status}
-                    onChange={handleChange}
-                    style={{
-                      backgroundColor: styles.inputBg,
-                      color: styles.text,
-                      border: styles.border,
-                    }}
-                  >
-                    <option value="">Select Status</option>
-                    <option value="pending">Pending</option>
-                    <option value="in-progress">In Progress</option>
-                    <option value="completed">Completed</option>
-                  </select>
-                  {submitted && errors.status && (
-                    <div className="invalid-feedback">{errors.status}</div>
-                  )}
-                </div>
                 <div className="col-md-6 mb-3">
                   <label className="form-label" style={{ color: styles.text }}>
                     Priority *
@@ -233,6 +231,7 @@ const TaskForm = ({ show, onClose, task }) => {
                       color: styles.text,
                       border: styles.border,
                     }}
+                    required
                   >
                     <option value="">Select Priority</option>
                     <option value="low">Low</option>
@@ -243,9 +242,10 @@ const TaskForm = ({ show, onClose, task }) => {
                     <div className="invalid-feedback">{errors.priority}</div>
                   )}
                 </div>
+
+                  
               </div>
 
-              {/* Due Date - REQUIRED */}
               <div className="mb-3">
                 <label className="form-label" style={{ color: styles.text }}>
                   Due Date *
@@ -266,7 +266,9 @@ const TaskForm = ({ show, onClose, task }) => {
                   <div className="invalid-feedback">{errors.due_date}</div>
                 )}
               </div>
+
             </div>
+
             <div className="modal-footer" style={{ borderTop: styles.divider }}>
               <button
                 type="button"

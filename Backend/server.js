@@ -1,56 +1,32 @@
-
+// Backend/server.js
 const express = require("express");
 const cors = require("cors");
-const dotenv = require("dotenv");
-const authRoutes = require("./routes/authRoutes");
-const contactRoutes = require("./routes/contactRoutes");
-const taskRoutes = require("./routes/taskRoutes");
+const config = require("./config/config");
 
-const knex = require("knex");
-const knexConfig = require("./knexfile");
-const { Model } = require("objection");
-
-dotenv.config();
+// ✅ Now config has all your environment variables
+console.log(
+  "📊 JWT_SECRET from config:",
+  config.jwtSecret ? "✅ Set" : "❌ Not set",
+);
+console.log("📊 DB_NAME from config:", config.dbName);
+console.log("📊 PORT from config:", config.port);
 
 const app = express();
-const PORT = process.env.PORT || 5000;
-
-// Database setup
-const db = knex(knexConfig.development);
-Model.knex(db);
 
 // Middleware
-app.use(
-  cors({
-    origin: ["http://localhost:3000", "http://192.168.1.20:3000"],
-    credentials: true,
-  }),
-);
+app.use(cors());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 // Routes
-app.use("/api/tasks", taskRoutes);
-app.use("/api/auth", authRoutes);
-app.use("/api/contacts", contactRoutes);
+app.use("/api/auth", require("./routes/authRoutes"));
+app.use("/api/tasks", require("./routes/taskRoutes"));
+app.use("/api/contacts", require("./routes/contactRoutes"));
 
-// Error handlers
-app.use((req, res) => {
-  res.status(404).json({ success: false, message: "Route not found" });
-});
+// ... rest of your server code
 
-app.use((err, req, res, next) => {
-  console.error("❌", err);
-  res.status(500).json({
-    success: false,
-    message: "Internal server error",
-  });
-});
-
-// Start server
+const PORT = config.port;
 app.listen(PORT, () => {
-  console.log(`✅ Server running on port ${PORT}`);
-  // Optional: Quick database check
-  db.raw("SELECT 1")
-    .then(() => console.log("✅ Database connected"))
-    .catch((err) => console.error("❌ Database error:", err.message));
+  console.log(`Server running on port ${PORT}`);
+  console.log(`Environment: ${config.nodeEnv}`);
 });

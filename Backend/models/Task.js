@@ -1,56 +1,53 @@
-const { Model } = require("objection");
+// const mongoose = require("mongoose");
 
-class Task extends Model {
-  static get tableName() {
-    return "tasks";
-  }
+// const taskSchema = new mongoose.Schema(
+//   {
+//     title: {
+//       type: String,
+//       required: [true, "Title is required"],
+//       trim: true,
+//       maxlength: [255, "Title cannot exceed 255 characters"],
+//     },
+//     description: {
+//       type: String,
+//       trim: true,
+//       maxlength: [1000, "Description cannot exceed 1000 characters"],
+//     },
+//     status: {
+//       type: String,
+//       enum: ["pending", "in-progress", "completed"],
+//       default: "pending",
+//       required: true,
+//     },
+//     priority: {
+//       type: String,
+//       enum: ["low", "medium", "high"],
+//       default: "medium",
+//       required: true,
+//     },
+//     due_date: {
+//       type: Date,
+//       required: [true, "Due date is required"],
+//     },
+//     order: {
+//       type: Number,
+//       default: 0,
+//     },
+//     user: {
+//       type: mongoose.Schema.Types.ObjectId,
+//       ref: "User",
+//       required: true,
+//     },
+//   },
+//   {
+//     timestamps: {
+//       createdAt: "created_at",
+//       updatedAt: "updated_at",
+//     },
+//   },
+// );
 
-  static get jsonSchema() {
-    return {
-      type: "object",
-      required: ["title", "user_id"],
-      properties: {
-        id: { type: "integer" },
-        user_id: { type: "integer" },
-        title: { type: "string", minLength: 1, maxLength: 255 },
-        description: {
-          type: ["string", "null"], // Allow null
-          maxLength: 1000,
-        },
-        status: {
-          type: "string",
-          enum: ["pending", "in-progress", "completed"],
-          default: "pending",
-        },
-        priority: {
-          type: "string",
-          enum: ["low", "medium", "high"],
-          default: "medium",
-        },
-        due_date: {
-          type: ["string", "null"], // Allow null
-          format: "date",
-        },
-        created_at: { type: "string", format: "date-time" },
-        updated_at: { type: "string", format: "date-time" },
-      },
-    };
-  }
+// // Index for efficient queries
+// taskSchema.index({ user: 1, status: 1, order: 1 });
 
-  static get relationMappings() {
-    // Use dynamic import to avoid circular dependency
-    const User = require("./User");
-    return {
-      user: {
-        relation: Model.BelongsToOneRelation,
-        modelClass: User,
-        join: {
-          from: "tasks.user_id",
-          to: "users.id",
-        },
-      },
-    };
-  }
-}
-
-module.exports = Task;
+// module.exports = mongoose.model("Task", taskSchema);
